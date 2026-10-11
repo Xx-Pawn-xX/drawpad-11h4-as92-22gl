@@ -1,0 +1,234 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0e14">
+  <title>DrawPad — Creative Studio</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#" aria-label="DrawPad home">
+      <span class="brand-icon">✳</span>
+      <span>Draw<span class="brand-light">Pad</span></span>
+      <span class="version">STUDIO</span>
+    </a>
+
+    <div class="top-actions">
+      <button id="undoBtn" class="icon-btn" title="Undo (Ctrl+Z)" aria-label="Undo">↶</button>
+      <button id="redoBtn" class="icon-btn" title="Redo (Ctrl+Y)" aria-label="Redo">↷</button>
+      <span class="separator"></span>
+      <button id="newBtn" class="btn secondary">＋ New</button>
+      <button id="openBtn" class="btn secondary">Open</button>
+      <button id="saveBtn" class="btn secondary">Save project</button>
+      <button id="exportBtn" class="btn primary">Export PNG ↗</button>
+    </div>
+  </header>
+
+  <main class="workspace">
+    <aside class="left-panel panel">
+      <div class="panel-heading">TOOLS</div>
+
+      <div class="tool-grid" id="toolGrid">
+        <button class="tool active" data-tool="pen" title="Brush (B)">
+          <span>✎</span><small>Brush</small>
+        </button>
+        <button class="tool" data-tool="eraser" title="Eraser (E)">
+          <span>◩</span><small>Eraser</small>
+        </button>
+        <button class="tool" data-tool="line" title="Line (L)">
+          <span>／</span><small>Line</small>
+        </button>
+        <button class="tool" data-tool="rect" title="Rectangle (R)">
+          <span>□</span><small>Rectangle</small>
+        </button>
+        <button class="tool" data-tool="ellipse" title="Ellipse (O)">
+          <span>◯</span><small>Ellipse</small>
+        </button>
+        <button class="tool" data-tool="fill" title="Fill bucket (G)">
+          <span>▨</span><small>Fill</small>
+        </button>
+        <button class="tool" data-tool="text" title="Text (T)">
+          <span>T</span><small>Text</small>
+        </button>
+        <button class="tool" data-tool="eyedropper" title="Eyedropper (I)">
+          <span>◉</span><small>Picker</small>
+        </button>
+        <button class="tool" data-tool="pan" title="Pan (H)">
+          <span>✥</span><small>Move</small>
+        </button>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <section class="settings">
+        <div class="panel-heading">BRUSH SETTINGS</div>
+        <label class="setting-label">
+          <span>Size</span><output id="sizeValue">8 px</output>
+        </label>
+        <input id="brushSize" type="range" min="1" max="100" value="8">
+
+        <label class="setting-label">
+          <span>Opacity</span><output id="opacityValue">100%</output>
+        </label>
+        <input id="brushOpacity" type="range" min="1" max="100" value="100">
+
+        <label class="setting-label" for="shapeMode">Shape style</label>
+        <select id="shapeMode">
+          <option value="stroke">Outline</option>
+          <option value="fill">Filled</option>
+        </select>
+
+        <label class="setting-label" for="fontSize">Text size</label>
+        <input id="fontSize" type="number" min="8" max="300" value="32">
+      </section>
+
+      <div class="panel-divider"></div>
+
+      <section class="settings">
+        <div class="panel-heading">COLOR</div>
+        <div class="color-current">
+          <input type="color" id="colorPicker" value="#8b9cff" aria-label="Choose drawing color">
+          <div>
+            <strong id="colorHex">#8B9CFF</strong>
+            <small>Foreground</small>
+          </div>
+        </div>
+
+        <label class="setting-label" for="hexInput">Hex code</label>
+        <input id="hexInput" type="text" value="#8B9CFF" maxlength="7">
+
+        <div class="setting-label palette-heading">
+          <span>Color palette</span>
+          <button id="addColorBtn" class="tiny-btn" title="Add current color">＋</button>
+        </div>
+        <div class="palette" id="palette"></div>
+      </section>
+
+      <div class="panel-divider"></div>
+
+      <section class="settings">
+        <div class="panel-heading">CANVAS</div>
+        <label class="setting-label" for="canvasPreset">Dimensions</label>
+        <select id="canvasPreset">
+          <option value="custom">Current size</option>
+          <option value="square">Square — 1000 × 1000</option>
+          <option value="portrait">Portrait — 900 × 1200</option>
+          <option value="landscape">Landscape — 1200 × 800</option>
+          <option value="a4">A4 ratio — 992 × 1403</option>
+        </select>
+
+        <div class="dimension-row">
+          <input id="canvasWidth" type="number" min="1" max="4096" value="1000" aria-label="Canvas width">
+          <span>×</span>
+          <input id="canvasHeight" type="number" min="1" max="4096" value="1000" aria-label="Canvas height">
+        </div>
+        <button id="resizeBtn" class="btn secondary full-width">Resize canvas</button>
+
+        <label class="check-row">
+          <input id="gridToggle" type="checkbox">
+          <span>Show grid</span>
+        </label>
+        <label class="check-row">
+          <input id="backgroundToggle" type="checkbox" checked>
+          <span>White background on export</span>
+        </label>
+      </section>
+    </aside>
+
+    <section class="canvas-area">
+      <div class="canvas-toolbar">
+        <div class="document-label">
+          <span class="live-dot"></span>
+          <span id="documentName">Untitled artwork</span>
+          <span class="unsaved" id="unsavedMark">●</span>
+        </div>
+        <div class="canvas-actions">
+          <button id="zoomOutBtn" class="icon-btn small" title="Zoom out">−</button>
+          <button id="zoomValue" class="zoom-value" title="Reset zoom">100%</button>
+          <button id="zoomInBtn" class="icon-btn small" title="Zoom in">＋</button>
+          <button id="fitBtn" class="btn secondary small-btn">Fit</button>
+          <button id="gridBtn" class="btn secondary small-btn">Grid</button>
+        </div>
+      </div>
+
+      <div class="canvas-viewport" id="viewport">
+        <div class="canvas-stage" id="stage">
+          <div class="canvas-stack" id="canvasStack"></div>
+          <canvas id="gridCanvas" aria-hidden="true"></canvas>
+        </div>
+      </div>
+
+      <footer class="statusbar">
+        <span id="statusText">Ready to draw</span>
+        <span id="canvasInfo">1000 × 1000 px</span>
+        <span id="coordinates">X: — Y: —</span>
+      </footer>
+    </section>
+
+    <aside class="right-panel panel">
+      <div class="panel-title-row">
+        <div class="panel-heading">LAYERS</div>
+        <button id="addLayerBtn" class="tiny-btn" title="Add layer">＋</button>
+      </div>
+
+      <div class="layer-actions">
+        <button id="renameLayerBtn" class="btn secondary">Rename</button>
+        <button id="duplicateLayerBtn" class="btn secondary">Duplicate</button>
+      </div>
+
+      <div class="layer-list" id="layerList"></div>
+
+      <div class="layer-actions">
+        <button id="moveLayerUpBtn" class="btn secondary" title="Move layer up">↑</button>
+        <button id="moveLayerDownBtn" class="btn secondary" title="Move layer down">↓</button>
+        <button id="deleteLayerBtn" class="btn danger" title="Delete selected layer">Delete</button>
+      </div>
+
+      <div class="panel-divider"></div>
+
+      <section class="settings">
+        <div class="panel-heading">LAYER PROPERTIES</div>
+        <label class="setting-label" for="layerOpacity">
+          <span>Opacity</span><output id="layerOpacityValue">100%</output>
+        </label>
+        <input id="layerOpacity" type="range" min="0" max="100" value="100">
+
+        <label class="setting-label" for="layerBlend">Blend mode</label>
+        <select id="layerBlend">
+          <option value="source-over">Normal</option>
+          <option value="multiply">Multiply</option>
+          <option value="screen">Screen</option>
+          <option value="overlay">Overlay</option>
+          <option value="darken">Darken</option>
+          <option value="lighten">Lighten</option>
+        </select>
+      </section>
+
+      <div class="panel-divider"></div>
+
+      <section class="settings tips">
+        <div class="panel-heading">QUICK SHORTCUTS</div>
+        <div><kbd>B</kbd> Brush</div>
+        <div><kbd>E</kbd> Eraser</div>
+        <div><kbd>G</kbd> Fill</div>
+        <div><kbd>T</kbd> Text</div>
+        <div><kbd>I</kbd> Eyedropper</div>
+        <div><kbd>H</kbd> Pan</div>
+        <div><kbd>Ctrl</kbd> + <kbd>Z</kbd> Undo</div>
+        <div><kbd>Ctrl</kbd> + <kbd>Y</kbd> Redo</div>
+        <div><kbd>Space</kbd> + drag to pan</div>
+        <div><kbd>Ctrl</kbd> + <kbd>S</kbd> Save project</div>
+      </section>
+    </aside>
+  </main>
+
+  <input type="file" id="projectFile" accept=".drawpad,.json,application/json" hidden>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+  <script src="script.js"></script>
+</body>
+</html>
